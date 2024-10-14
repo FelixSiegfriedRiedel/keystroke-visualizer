@@ -1,58 +1,104 @@
-char keyChar;
-char lastKeyChar;
-boolean isNewKey;
-
-boolean isShadow = true;
-
-float textSize = random(50, 100);
-float textX = random(10, width);
-float textY = random(10, height);
-color textColor = color(random(255), random(255), color(255));
-
-String[] fontList;
-PFont textFont;
+PImage canvas;
+int isShadow = 0;
 
 void setup() {
   size(800, 800);
+  background(255);
+  textMode(SHAPE);
   fontList = PFont.list();
   textFont = createFont(fontList[int(random(fontList.length))], textSize);
-  textAlign(CENTER, CENTER);
+  canvas = get(0,0, width, height);
+  
+
+
 }
 
 void draw() {
-  if (isNewKey) {
-    if (keyChar != ' ') {
-      textX += textWidth(lastKeyChar);
+  delay(200);
+  //getWord();
+  word = "yetzt";
+  isWord = true;
+  if(isWord) {
+    getStyle();
+    getVoice(word);
+    if(0 > random(-2,1)) {
+      drawBox();
+      drawShadow();
+      drawOutline();
+      fill(textColor);
+      text(word, textX, textY); 
     } else {
-      textX = random(10, width);
-      textY = random(10, height);
-      textSize = random(50, 100);
-      textColor = color(random(255), random(255), color(255));
-      textFont = createFont(fontList[int(random(fontList.length))], textSize);
-      textFont(textFont);
-      print(textFont);
+      fill(textColor);
+      drawCurvedText();
     }
-    fill(textColor);
-    if(isShadow) {
-      textSize(textSize * 1.5);
-      fill(color(0,0,0));
-      text(keyChar, textX, textY);
+    word = ""; 
+    isWord = false;
+  }
+
+}
+
+
+void drawBox() {
+  if(hasBox && !hasShadow) {
+      strokeWeight(0.05*textSize);
+      stroke(textColor);
+      fill(invertedTextColor);
+      rect(textX-textWidth*0.05, textY-textSize*0.95, textWidth*1.1, textSize*1.1);
+    }
+}
+
+void drawShadow() {
+  int z = 1;
+  int i = 0;
+  if(hasShadow && !hasBox) {
+    z = -int(random(textSize));
+    fill(0);
+    while(i > z){
+      textSize = textSize-1;
       textSize(textSize);
-    }
-    fill(textColor);
-    text(keyChar, textX, textY); 
-    lastKeyChar = keyChar;
-    isNewKey = false;
+      fill(invertedTextColor);
+      drawOutline();
+      text(word, textX, textY);
+      i--;
+  } 
+  textSize(textSize - i);
+}
+}
+
+void drawOutline(String word, float x, float y) {
+  int outlinesize = int(textSize*0.03);
+  for (int i=-outlinesize; i<=outlinesize; i++) {
+    for (int j = -outlinesize; j<=outlinesize; j++) {
+      fill(invertedTextColor);
+      text(word, x-i, y-j); 
   }
 }
-
-void getWord() {
-  
 }
 
-void keyReleased() {
-  if (key != CODED && key != '\n') { 
-    keyChar = key;
-    isNewKey = true;
+void drawOutline() {
+  drawOutline(word, textX, textY);
+}
+
+void drawCurvedText() {
+  char[] wordAsChars = (word).toCharArray();
+  int charCount = wordAsChars.length;
+  for (int i = 0; i < charCount; ++i) {
+    float step1 = i * 1.0 / float(charCount);
+    
+    float x = curvePoint(x1, x2, x3, x4, step1);
+    float y = curvePoint(y1, y2, y3, y4, step1);
+    
+    float tanx = curveTangent(x1, x2, x3, x4, step1);
+    float tany = curveTangent(y1, y2, y3, y4, step1);
+    
+    float angle = atan2(tany, tanx);
+
+    pushMatrix();
+    translate(x, y);
+    rotate(angle);
+    drawOutline(""+wordAsChars[i], 0, 0);
+    fill(textColor);
+    text(wordAsChars[i], 0.0, 0.0);
+    popMatrix();
   }
 }
