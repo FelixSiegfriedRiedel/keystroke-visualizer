@@ -4,8 +4,8 @@ float textY = random(10, height);
 float textWidth;
 color textColor;
 color invertedTextColor;
-boolean hasShadow;
-boolean hasBox;
+boolean hasShadow = true;
+boolean hasBox = false;
 
 String[] fontList;
 PFont textFont;
@@ -18,12 +18,11 @@ float x1, y1,
 void getStyle() {
   hasShadow = (0 > random(-1,4)); 
   hasBox = (0 > random(-1,4));
-  print(hasBox);
   textColor  = color(random(150, 255), random(150, 255), random(150, 255));
   invertedTextColor = color(255 - red(textColor), 255 - green(textColor), 255 - blue(textColor));
   textSize = random(10, height/4);
-  textFont = createFont(fontList[int(random(fontList.length))], textSize);
-  textFont(textFont);
+  //textFont = createFont(fontList[int(random(fontList.length))], textSize);
+  //textFont(textFont);
   textWidth = textWidth(word);
   textX = random(0, width-textWidth);
   textY = random(textSize, height);
@@ -52,7 +51,7 @@ void drawShadow() {
   int z = 1;
   int i = 0;
   if(hasShadow && !hasBox) {
-    z = -int(random(textSize));
+    z = -int(random(textSize*0.5));
     fill(0);
     while(i > z){
       textSize = textSize-1;
