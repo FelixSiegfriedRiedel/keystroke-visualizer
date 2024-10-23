@@ -3,6 +3,7 @@ int cursorBlinkRate = 500;  // milliseconds
 long lastBlinkTime = 0;
 boolean showCursor = true;
 boolean isBackspace = false;
+PrintWriter output;
 
 void recordText() {
   if (isNewKey) {
@@ -47,5 +48,8 @@ void keyPressed() {
   if (keyCode == 8) {
     isNewKey = false;
     isBackspace = true;
+  }
+  if (keyCode == ESC) {
+    
   }
 }
