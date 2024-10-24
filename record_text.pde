@@ -5,7 +5,7 @@ boolean showCursor = true;
 boolean isBackspace = false;
 PrintWriter output;
 
-void recordText() {
+void recordText(float w) {
   if (isNewKey) {
     text += key;
     isNewKey = false;
@@ -16,24 +16,24 @@ void recordText() {
     isBackspace = false;
   }
 
-  if (textWidth(text) > width - 20) {
+  if (textWidth(text) > w - 20) {
     text = text.substring(0, text.length() - 1);
     text+="\n";
   }
   
 }
 
-void displayText() {
+void displayText(int x, int y) {
   if (millis() - lastBlinkTime > cursorBlinkRate) {
     showCursor = !showCursor;
     lastBlinkTime = millis();
   }
   if (showCursor) {
      fill(0);
-     text(text+"✍", 10, textAscent() + textDescent());
+     text(text+"✍", x, y+textAscent() + textDescent());
   } else {
     fill(0);
-    text(text, 10, textAscent() + textDescent());
+    text(text, x, y+textAscent() + textDescent());
   }
 }
 

@@ -4,8 +4,8 @@ float textY = random(10, height);
 float textWidth;
 color textColor;
 color invertedTextColor;
-boolean hasShadow = true;
-boolean hasBox = false;
+boolean hasShadow;
+boolean hasBox;
 
 String[] fontList;
 PFont textFont;
@@ -16,17 +16,21 @@ float x1, y1,
   x4, y4;
 
 void getStyle() {
-  hasShadow = (0 > random(-1,4)); 
-  hasBox = (0 > random(-1,4));
+  hasShadow = (0 > random(-5,2));
+  print(hasShadow);
+  hasBox = (0 > random(-2,2));
+  print(hasBox);
+  println();
   textColor  = color(random(150, 255), random(150, 255), random(150, 255));
   invertedTextColor = color(255 - red(textColor), 255 - green(textColor), 255 - blue(textColor));
-  textSize = random(10, height/4);
-  //textFont = createFont(fontList[int(random(fontList.length))], textSize);
-  //textFont(textFont);
+  textSize = random(30, height/4);
+  //textFont = createFont("Unifont", textSize);
+  textFont = createFont(fontList[int(random(fontList.length))], textSize);
+  textFont(textFont);
   textWidth = textWidth(word);
   textX = random(0, width-textWidth);
   textY = random(textSize, height);
-  getCurvePoints();
+  //getCurvePoints();
 }
 
 void getCurvePoints() {
@@ -51,7 +55,7 @@ void drawShadow() {
   int z = 1;
   int i = 0;
   if(hasShadow && !hasBox) {
-    z = -int(random(textSize*0.5));
+    z = -int(random(textSize));
     fill(0);
     while(i > z){
       textSize = textSize-1;
