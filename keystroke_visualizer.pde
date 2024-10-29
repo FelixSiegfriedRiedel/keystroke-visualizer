@@ -2,7 +2,8 @@ int isShadow = 0;
 int randomSeed;
 boolean isRecording = true;
 boolean wordsPrinted = true;
-int i;
+boolean isFlush = false;
+float i;
 String[] words;
 
 import controlP5.*;
@@ -10,6 +11,7 @@ import controlP5.*;
 ControlP5 cp5;
 Button recordButton;
 Button stopButton;
+Button flushButton;
 
 void setup() {
   size(800, 800);
@@ -21,85 +23,103 @@ void setup() {
 
   cp5 = new ControlP5(this);
 
-  recordButton = cp5.addButton("record")
+recordButton = cp5.addButton("record")
                     .setValue(0)
-                    .setPosition(width - 100, 0)
-                    .setSize(100, 50);
+                    .setPosition(600, 490)
+                    .setSize(160, 50)
+                  .setColorBackground(color(0, 0, 0, 1)) // Background color
+                    .setColorForeground(color(0, 0, 0, 1)) // Hover color
+                    .setColorActive(color(0, 0, 0, 1)) // Active color
+                    .setColorValue(color(0, 0, 0, 1)) // Text color
+                    .setCaptionLabel("")
+                    .setColorLabel(color(0, 0, 0, 1)); // Label color
 
   stopButton = cp5.addButton("stop")
                    .setValue(0)
-                   .setPosition(width - 100, 0)
-                   .setSize(100, 50)
+                   .setPosition(600, 490)
+                   .setSize(160, 50)
+                   .setColorBackground(color(0,0,0 , 1))
+                    .setColorForeground(color(0, 0, 0, 1)) // Hover color
+                    .setColorActive(color(0, 0, 0, 1)) // Active color
+                    .setColorValue(color(0, 0, 0, 1)) // Text color
+                    .setColorLabel(color(0, 0, 0, 1)) // Label color
+                    .setCaptionLabel("")
                    .hide(); // Hide stop button initially
+                   
+   flushButton = cp5.addButton("flush")
+                   .setValue(0)
+                   .setPosition(120, 710)
+                   .setSize(150, 50)
+                    .setColorBackground(color(0,0,0 , 1))
+                    .setColorForeground(color(0, 0, 0, 1)) // Hover color
+                    .setColorActive(color(0, 0, 0, 1)) // Active color
+                    .setColorValue(color(0, 0, 0, 1)) // Text color
+                    .setColorLabel(color(0, 0, 0, 1)) // Label color
+                    .setCaptionLabel("flush");
+                   
 }
 
 void draw() {
+if ((mouseX > 150 && mouseX < 150 + 120 && mouseY > 710 && mouseY < 710 + 50) ||
+        (mouseX > 600 && mouseX < 600 + 160 && mouseY > 490 && mouseY < 490 + 50)) {
+        cursor(HAND);
+    } else {
+        cursor(ARROW);
+    } 
+  
 background(255);
 noStroke();
 
-toilet(86, 340);
-
-speechBubble(170, 40, 390, 100, true);
-speechBubble(160, 30, 390, 100, true);
-
-if(isRecording) {
-speechBubble(170, 265, 480, 200, false);
-speechBubble(160, 255, 480, 200, false);
-}
+toilet(110, 350);
+toilet(100, 340);
 
 
-//Face
-fill(0);
-rect(45, 170, 160, 50);
-fill(222, 222, 198);
-rect(35, 160, 160, 50);
-fill(3);
-textFont = createFont("Unifont", 40);
-textFont(textFont);
-text("( ͡° ͜ʖ ͡°)", 34, 199);
 
-
-fill(0);
-rect(611, 500, 160, 50);
-fill(242, 201, 239);
-rect(602, 490, 160, 50);
-fill(3);
-textFont = createFont("Unifont", 40);
-textFont(textFont);
-text("(ಥ﹏ಥ)", 599, 528);
-
-textFont = createFont("Unifont", 30);
-textFont(textFont);
-text("WHICH THOUGHTS\nBOTHER YOU TODAY?", 198, 78);
-
+faces();
   if (isRecording) {
+    speechBubble(170, 265, 480, 200, false);
+    speechBubble(160, 255, 480, 200, false);
+    speechBubble(170, 40, 390, 100, true);
+    speechBubble(160, 30, 390, 100, true);
+    textFont = createFont("Unifont", 30);
+    textFont(textFont);
+    fill(0);
+    text("WHICH THOUGHTS\nBOTHER YOU TODAY?", 198, 78);
     recordButton.hide();
     stopButton.show();
     fill(0);
     textFont = createFont("Unifont", 30);
     textFont(textFont);
     recordText(width - 355);
-    displayText(300, 366);
+    displayText(188, 278);
     wordsPrinted = false;
     i = 0;
-  } else if (!wordsPrinted) {
+  } else {
     stopButton.hide();
     recordButton.show();
-    word = words[i].replace("\n", "");
-    if (word.length() > 0) {
-      getStyle();
-      getVoice(word);
-      drawBox();
-      drawShadow();
-      drawOutline();
-      fill(textColor);
-      text(word, textX, textY); 
-    } 
-    i++;
-    delay(200);
-    if(i == words.length) {
-      wordsPrinted = true; 
+    speechBubble(170, 40, 390, 100, true);
+    speechBubble(160, 30, 390, 100, true);
+    textFont = createFont("Unifont", 30);
+    textFont(textFont);
+    fill(0);
+    if(isFlush) {
+      text("FLUSH THEM!!!!", 198, 78);
+    } else {
+      text("WHICH THOUGHTS\nBOTHER YOU TODAY?", 198, 78);
     }
+    pushMatrix();
+  
+  translate(250, 505);
+  rotate(radians(i));
+  drawTextOnArc(text, 0,0, 90-i*1);
+  i += 1;
+  if(i > 90) {
+    isRecording = true;
+    text = "";
+    i = 0;
+  }
+  popMatrix();
+  translate(0,0);
   }
 }
 
@@ -120,6 +140,13 @@ void stop() {
   if (lines.length >1) {
     words = lines[1].split(" ");
   }
+}
+
+void flush() {
+  if(text.length() > 0) {
+      isRecording = false;
+    } 
+  
 }
 
 
@@ -171,39 +198,96 @@ void toilet(int x, int y) {
   
   // Outer outline
   fill(0);
-  rect(120, 680, 350, 120);  // Base
-  rect(140, 590, 310, 90);   // Tank
-  rect(120, 360, 350, 300);  // Back
-  rect(130, 350, 330, 50);   // Rim
-  rect(140, 340, 310, 50);   // Rim
+  rect(120, 680, 300, 120);  
+  rect(140, 590, 260, 90);   
+  rect(120, 360, 300, 300);  
+  rect(130, 350, 270, 50);   
+  rect(140, 340, 260, 50);   
 
   // Outer color (porcelain)
   fill(253);
-  rect(130, 690, 330, 100);  // Base fill
-  rect(150, 350, 290, 330);   // Tank fill
-  rect(130, 370, 330, 280);   // Back fill
-  rect(140, 360, 310, 50);    // Rim fill
+  rect(130, 690, 280, 100);  // Base fill
+  rect(150, 350, 240, 330);   // Tank fill
+  rect(130, 370, 280, 280);   // Back fill
+  rect(140, 360, 260, 50);    // Rim fill
 
   // Inner outline (bowl)
   fill(0);
-  rect(170, 370, 250, 260);   // Bowl outline
-  rect(160, 380, 270, 241);    // Inner bowl outline
+  rect(170, 370, 200, 260);   // Bowl outline
+  rect(160, 380, 220, 241);    // Inner bowl outline
 
   // Water in bowl
-  fill(141, 181, 255);
-  rect(170, 380, 250, 240);    // Water fill
+  fill(126, 174, 247);
+  rect(169, 380, 200, 240);    // Water fill
 
   // Hole in bowl (under water)
-  fill(0, 0, 0, 53);
-  rect(260, 480, 70, 110);      // Hole
+     fill(0, 0, 0, 77);
+  rect(230, 470, 80, 130);     
+  fill(0, 0, 0, 101);
+  rect(245, 490, 50, 90);      
+  
 
   // Outline toilet button
   fill(0);
-  rect(150, 710, 170, 50);      // Button outline
+  rect(150, 710, 120, 50);      // Button outline
 
   // Filling toilet button
   fill(252);
-  rect(160, 720, 150, 30);      // Button fill
+  rect(160, 720, 100, 30);      // Button fill
 
   popMatrix();
+}
+
+
+void faces() {
+  
+//Face
+fill(0);
+rect(45, 170, 160, 50);
+fill(222, 222, 198);
+rect(35, 160, 160, 50);
+fill(3);
+textFont = createFont("Unifont", 40);
+textFont(textFont);
+text("( ͡° ͜ʖ ͡°)", 34, 199);
+
+
+fill(0);
+rect(610, 500, 160, 50);
+fill(242, 201, 239);
+rect(600, 490, 160, 50);
+fill(3);
+textFont = createFont("Unifont", 40);
+textFont(textFont);
+text("(ಥ﹏ಥ)", 599, 528);
+}
+
+void drawTextOnArc(String text, float centerX, float centerY, float radius) {
+  if (radius > 0) {
+  float charSize = 100 * radius / 360;  // Define the size of the letters
+  textSize(charSize);
+  int len = text.length();
+  
+  // Calculate the total arc angle based on the length of the text
+  float arcLength = len * charSize * 0.5;      // Approximate total text length
+  float arcAngle = arcLength / radius;   // Calculate angle span for arc
+  
+  float startAngle = -arcAngle / 2;      // Start angle to center text on the arc
+
+  // Loop through each character in the string
+  for (int i = 0; i < len; i++) {
+    float angle = startAngle + map(i, 0, len - -2, 0, arcAngle);  // Angle for each character
+    
+    // Calculate the x, y position on the arc for each character
+    float x = centerX + cos(angle) * (radius-i*0.5);
+    float y = centerY + sin(angle) * (radius-i*0.5);
+    
+    // Push matrix to rotate each character separately
+    pushMatrix();
+    translate(x, y);                     // Move to the character position
+    rotate(angle + PI / 2);              // Rotate to align with arc direction
+    text(text.charAt(i), 1, -9);          // Draw the character
+    popMatrix();
+  }
+  }
 }

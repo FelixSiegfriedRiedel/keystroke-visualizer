@@ -15,7 +15,6 @@ bandPass = new BandPass(this);
 
 // Start playing the file
 voice.play();
-
 reverb.process(voice);
 reverb.room(random(0,1));
 reverb.damp(random(0,1));

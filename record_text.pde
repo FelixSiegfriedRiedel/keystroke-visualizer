@@ -6,8 +6,9 @@ boolean isBackspace = false;
 PrintWriter output;
 
 void recordText(float w) {
-  if (isNewKey) {
+  if (isNewKey && text.length() < 144) {
     text += key;
+    text = text.toUpperCase();
     isNewKey = false;
   }
 
@@ -16,11 +17,11 @@ void recordText(float w) {
     isBackspace = false;
   }
 
-  if (textWidth(text) > w - 20) {
+  if (textWidth(text) > w - 20 && text.length() < 144) {
+    String breakChar = text.substring(text.length()-1, text.length());
     text = text.substring(0, text.length() - 1);
-    text+="\n";
+    text+="\n" + breakChar;
   }
-  
 }
 
 void displayText(int x, int y) {
