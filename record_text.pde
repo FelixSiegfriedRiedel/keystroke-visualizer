@@ -4,6 +4,7 @@ long lastBlinkTime = 0;
 boolean showCursor = true;
 boolean isBackspace = false;
 PrintWriter output;
+int millis;
 
 void recordText(float w) {
   if (isNewKey && text.length() < 144) {
@@ -43,6 +44,8 @@ void displayText(int x, int y) {
 void keyPressed() {
   if (key != CODED) { 
     isNewKey = true;
+    keySound();
+    millis = millis();
   } else {
     isNewKey = false;
   }

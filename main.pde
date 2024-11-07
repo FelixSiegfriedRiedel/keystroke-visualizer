@@ -3,8 +3,29 @@ int randomSeed;
 boolean isRecording = true;
 boolean wordsPrinted = true;
 boolean isFlush = false;
-float i;
-String[] words;
+boolean isRefill = false;
+
+float textSize = 30;
+float textX = random(10, width);
+float textY = random(10, height);
+float textWidth;
+color textColor;
+
+String[] fontList;
+PFont textFont;
+
+
+boolean isSewer = false;
+
+int i;
+int textLength;
+
+int lastTime = 0;
+int delayTime = 20;
+
+PImage tiles;
+PImage sewer;
+
 
 import controlP5.*;
 
@@ -14,8 +35,13 @@ Button stopButton;
 Button flushButton;
 
 void setup() {
+  initBounce();
+  delay(100);
   size(800, 800);
-  background(255);
+tiles = loadImage("img/tiles.jpg");
+sewer = loadImage("img/sewer.jpg");
+initSound();
+background(tiles);
   textMode(SHAPE);
   fontList = PFont.list();
   textFont = createFont("Unifont", 90);
@@ -23,16 +49,16 @@ void setup() {
 
   cp5 = new ControlP5(this);
 
-recordButton = cp5.addButton("record")
-                    .setValue(0)
-                    .setPosition(600, 490)
-                    .setSize(160, 50)
-                  .setColorBackground(color(0, 0, 0, 1)) // Background color
-                    .setColorForeground(color(0, 0, 0, 1)) // Hover color
-                    .setColorActive(color(0, 0, 0, 1)) // Active color
-                    .setColorValue(color(0, 0, 0, 1)) // Text color
-                    .setCaptionLabel("")
-                    .setColorLabel(color(0, 0, 0, 1)); // Label color
+  recordButton = cp5.addButton("record")
+                      .setValue(0)
+                      .setPosition(600, 490)
+                      .setSize(160, 50)
+                    .setColorBackground(color(0, 0, 0, 1)) // Background color
+                      .setColorForeground(color(0, 0, 0, 1)) // Hover color
+                      .setColorActive(color(0, 0, 0, 1)) // Active color
+                      .setColorValue(color(0, 0, 0, 1)) // Text color
+                      .setCaptionLabel("")
+                      .setColorLabel(color(0, 0, 0, 1)); // Label color
 
   stopButton = cp5.addButton("stop")
                    .setValue(0)
@@ -54,99 +80,134 @@ recordButton = cp5.addButton("record")
                     .setColorForeground(color(0, 0, 0, 1)) // Hover color
                     .setColorActive(color(0, 0, 0, 1)) // Active color
                     .setColorValue(color(0, 0, 0, 1)) // Text color
-                    .setColorLabel(color(0, 0, 0, 1)) // Label color
-                    .setCaptionLabel("flush");
+                    .setColorLabel(color(0, 0, 0, 1)); // Label color
                    
 }
 
 void draw() {
-if ((mouseX > 150 && mouseX < 150 + 120 && mouseY > 710 && mouseY < 710 + 50) ||
-        (mouseX > 600 && mouseX < 600 + 160 && mouseY > 490 && mouseY < 490 + 50)) {
-        cursor(HAND);
+if(isSewer) {
+  background (sewer);
+  for (Word word : words) { 
+    if (frameCount < frameCountLimit) {
+      word.collide();
+      word.move();
     } else {
-        cursor(ARROW);
-    } 
-  
-background(255);
-noStroke();
-
-toilet(110, 350);
-toilet(100, 340);
-
-
-
-faces();
-  if (isRecording) {
-    speechBubble(170, 265, 480, 200, false);
-    speechBubble(160, 255, 480, 200, false);
-    speechBubble(170, 40, 390, 100, true);
-    speechBubble(160, 30, 390, 100, true);
-    textFont = createFont("Unifont", 30);
-    textFont(textFont);
-    fill(0);
-    text("WHICH THOUGHTS\nBOTHER YOU TODAY?", 198, 78);
-    recordButton.hide();
-    stopButton.show();
-    fill(0);
-    textFont = createFont("Unifont", 30);
-    textFont(textFont);
-    recordText(width - 355);
-    displayText(188, 278);
-    wordsPrinted = false;
-    i = 0;
-  } else {
-    stopButton.hide();
-    recordButton.show();
-    speechBubble(170, 40, 390, 100, true);
-    speechBubble(160, 30, 390, 100, true);
-    textFont = createFont("Unifont", 30);
-    textFont(textFont);
-    fill(0);
-    if(isFlush) {
-      text("FLUSH THEM!!!!", 198, 78);
-    } else {
-      text("WHICH THOUGHTS\nBOTHER YOU TODAY?", 198, 78);
+      isSewer = false;
     }
-    pushMatrix();
+    word.display();  
+  }
+  frameCount++;
+  }
+else {
+  if ((mouseX > 150 && mouseX < 150 + 120 && mouseY > 710 && mouseY < 710 + 50) ||
+          (mouseX > 600 && mouseX < 600 + 160 && mouseY > 490 && mouseY < 490 + 50)) {
+          cursor(HAND);
+  } else {
+      cursor(ARROW);
+  } 
+    
+  background(tiles);
+  fill(0);
+  //textSize(10);
+  //text(text + "<-", 0, 20);
+  textSize(textSize);
+  noStroke();
   
-  translate(250, 505);
-  rotate(radians(i));
-  drawTextOnArc(text, 0,0, 90-i*1);
-  i += 1;
-  if(i > 90) {
-    isRecording = true;
-    text = "";
-    i = 0;
-  }
-  popMatrix();
-  translate(0,0);
-  }
+  toilet(110, 350, 1);
+  toilet(100, 340, int(map(i,0,140,0, 100)));
+  
+  
+  
+  faces();
+    if (isRecording) {
+      stopButton.show();
+      recordButton.hide();
+      speechBubble(170, 265, 480, 200, false);
+      speechBubble(160, 255, 480, 200, false);
+      speechBubble(170, 40, 390, 100, true);
+      speechBubble(160, 30, 390, 100, true);
+      textFont = createFont("Unifont", 30);
+      textFont(textFont);
+      fill(0);
+      text("WHAT'S ON YOUR MIND?", 198, 78);
+      fill(0);
+      textFont = createFont("Unifont", 30);
+      textFont(textFont);
+      recordText(width - 355);
+      displayText(188, 278);
+      wordsPrinted = false;
+      i = 0;
+    } else  {
+      stopButton.hide();
+      recordButton.show();
+      speechBubble(170, 40, 390, 100, true);
+      speechBubble(160, 30, 390, 100, true);
+      textFont = createFont("Unifont", 30);
+      textFont(textFont);
+      fill(0);
+      if(isFlush) {
+        text("DOWN THE TOILET!!!!", 198, 78);
+        if(i == text.length()) {
+          isRefill = true;
+          isFlush = false;
+        }
+        translate(242, 505);
+        //rotate(radians(i));
+        println(text.length()-i);
+        println(i);
+        drawTextOnArc(text.substring(0,text.length()-i), 0,0, text.length()-i);
+        translate(0,0);
+        if (millis() - lastTime >= delayTime) {
+          i++;
+          lastTime = millis();  
+        }
+      } else if(isRefill) {
+        text("NICE.", 198, 78);
+        if (millis() - lastTime >= delayTime) {
+          i--;
+          lastTime = millis();  
+        }
+        if(i==0) {
+          isSewer = true;
+          isRefill = false;
+          isRecording = true;
+          text="";
+        }
+      }
+      else {
+        text("WHAT'S ON YOUR MIND?", 198, 78);
+      }
+      pushMatrix();
+    
+    
+    popMatrix();
+    translate(0,0);
+    }
+}
 }
 
 void record() {
+  text = text.substring(0, textLength);
   isRecording = true;
   output = createWriter("text.txt"); 
+  print(text.length());
 }
 
 void stop() {
-  background(255);
   isRecording = false;
-  output.println(int(random(1000)));
-  output.println(text);
-  output.flush(); 
-  output.close();  
-  String[] lines = loadStrings("text.txt");
-  randomSeed(int(lines[0]));
-  if (lines.length >1) {
-    words = lines[1].split(" ");
+  textLength = text.length();
+  if(textLength>0) {
+    allWords += " "+text;
+    initBounce();
+    isFlush = true;
+    flushSound();
+    for(int i = textLength; i<=140-textLength; i++) {text+=" ";}
   }
+  print(text.length());
 }
 
 void flush() {
-  if(text.length() > 0) {
-      isRecording = false;
-    } 
-  
+  stop();
 }
 
 
@@ -192,7 +253,7 @@ void speechBubble(int x, int y, int bubbleWidth, int bubbleHeight, boolean left)
 }
 }
 
-void toilet(int x, int y) {
+void toilet(int x, int y, int i) {
   pushMatrix();
   translate(x-120, y-340);
   
@@ -216,15 +277,19 @@ void toilet(int x, int y) {
   rect(170, 370, 200, 260);   // Bowl outline
   rect(160, 380, 220, 241);    // Inner bowl outline
 
+  //bowl
+  fill(253);
+  rect(169, 380, 200, 240);
+
   // Water in bowl
   fill(126, 174, 247);
-  rect(169, 380, 200, 240);    // Water fill
+  rect(169+i, 380+i, 200-2*i, 240-2*i);    // Water fill
 
   // Hole in bowl (under water)
      fill(0, 0, 0, 77);
-  rect(230, 470, 80, 130);     
+  rect(230, 440, 80, 120);     
   fill(0, 0, 0, 101);
-  rect(245, 490, 50, 90);      
+  rect(245, 455, 50, 90);      
   
 
   // Outline toilet button
@@ -261,32 +326,32 @@ textFont = createFont("Unifont", 40);
 textFont(textFont);
 text("(ಥ﹏ಥ)", 599, 528);
 }
-
 void drawTextOnArc(String text, float centerX, float centerY, float radius) {
   if (radius > 0) {
-  float charSize = 100 * radius / 360;  // Define the size of the letters
+  float charSize = 100 * radius / 360;
   textSize(charSize);
   int len = text.length();
   
   // Calculate the total arc angle based on the length of the text
-  float arcLength = len * charSize * 0.5;      // Approximate total text length
+  float arcLength = len * charSize * 0.7;      // Approximate total text length
   float arcAngle = arcLength / radius;   // Calculate angle span for arc
   
-  float startAngle = -arcAngle / 2;      // Start angle to center text on the arc
+  float startAngle = -arcAngle;      // Start angle to center text on the arc
 
   // Loop through each character in the string
   for (int i = 0; i < len; i++) {
-    float angle = startAngle + map(i, 0, len - -2, 0, arcAngle);  // Angle for each character
+    float angle = startAngle + map(i, 0, len, 0, arcAngle);  // Angle for each character
     
     // Calculate the x, y position on the arc for each character
-    float x = centerX + cos(angle) * (radius-i*0.5);
-    float y = centerY + sin(angle) * (radius-i*0.5);
+    float x = centerX + cos(angle) * (radius-i*0.6);
+    float y = centerY + sin(angle) * (radius-i*0.6);
     
     // Push matrix to rotate each character separately
     pushMatrix();
     translate(x, y);                     // Move to the character position
-    rotate(angle + PI / 2);              // Rotate to align with arc direction
-    text(text.charAt(i), 1, -9);          // Draw the character
+    rotate(angle + PI / 2);     // Rotate to align with arc direction
+    textSize(charSize - (charSize/len) * i);
+    text(text.charAt(i), 0, 0);          // Draw the character
     popMatrix();
   }
   }
