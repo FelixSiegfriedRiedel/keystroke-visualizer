@@ -6,7 +6,7 @@ boolean isBackspace = false;
 PrintWriter output;
 int millis;
 
-void recordText(float w) {
+void recordText() {
   if (isNewKey && text.length() < 144) {
     text += key;
     text = text.toUpperCase();
@@ -18,7 +18,7 @@ void recordText(float w) {
     isBackspace = false;
   }
 
-  if (textWidth(text) > w - 20 && text.length() < 144) {
+  if (textWidth(text) > width - 355 && text.length() < 144) {
     String breakChar = text.substring(text.length()-1, text.length());
     text = text.substring(0, text.length() - 1);
     text+="\n" + breakChar;
@@ -52,8 +52,5 @@ void keyPressed() {
   if (keyCode == 8) {
     isNewKey = false;
     isBackspace = true;
-  }
-  if (keyCode == ESC) {
-    
   }
 }

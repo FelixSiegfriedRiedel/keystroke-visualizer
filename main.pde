@@ -86,6 +86,7 @@ background(tiles);
 
 void draw() {
 if(isSewer) {
+  flushButton.hide();
   background (sewer);
   for (Word word : words) { 
     if (frameCount < frameCountLimit) {
@@ -99,6 +100,7 @@ if(isSewer) {
   frameCount++;
   }
 else {
+  flushButton.show();
   if ((mouseX > 150 && mouseX < 150 + 120 && mouseY > 710 && mouseY < 710 + 50) ||
           (mouseX > 600 && mouseX < 600 + 160 && mouseY > 490 && mouseY < 490 + 50)) {
           cursor(HAND);
@@ -133,7 +135,7 @@ else {
       fill(0);
       textFont = createFont("Unifont", 30);
       textFont(textFont);
-      recordText(width - 355);
+      recordText();
       displayText(188, 278);
       wordsPrinted = false;
       i = 0;
@@ -275,15 +277,15 @@ void toilet(int x, int y, int i) {
   // Inner outline (bowl)
   fill(0);
   rect(170, 370, 200, 260);   // Bowl outline
-  rect(160, 380, 220, 241);    // Inner bowl outline
+  rect(160, 380, 220, 240);    // Inner bowl outline
 
   //bowl
   fill(253);
-  rect(169, 380, 200, 240);
+  rect(170, 380, 200, 240);
 
   // Water in bowl
   fill(126, 174, 247);
-  rect(169+i, 380+i, 200-2*i, 240-2*i);    // Water fill
+  rect(170+i, 380+i, 200-2*i, 240-2*i);    // Water fill
 
   // Hole in bowl (under water)
      fill(0, 0, 0, 77);
